@@ -87,7 +87,8 @@ export const createCaptain = async (req: Request, res: Response) => {
         res.status(201).json({
             status: 200,
             success: true,
-            message: {
+            message: "Captain created successfully",
+            result: {
                 newUser,
                 token
             }
@@ -102,3 +103,147 @@ export const createCaptain = async (req: Request, res: Response) => {
         });
     }
 };
+
+
+export const loginCaptain = async (req: Request, res: Response) => {
+    try {
+
+        const { email, password } = req.body;
+
+        const schema = Joi.object({
+            email: Joi.string().email().required().label("Email"),
+            password: Joi.string().min(3).required().label("Password"),
+        });
+
+        // ✅ Perform validation
+        const { error } = schema.validate({ email, password }, { abortEarly: false });
+
+        if (error) {
+            res.status(400).json({
+                status: 400,
+                success: false,
+                message: "Validation Error",
+                errors: error.details.map(err => err.message),  // ✅ Fixed error handling
+            });
+            return;
+        }
+
+        const user = await Captain.findOne({ email }).select('+password');
+
+        if (!user) {
+            res.status(400).json({ message: 'Invalid email or password' });
+            return;
+        };
+
+        const isPasswordMatch = await bcrypt.compare(password, user.password);
+
+        if (!isPasswordMatch) {
+            res.status(400).json({ message: 'Invalid email or password' });
+            return;
+        };
+
+        const token = generateAccessToken({
+            ...user.toObject(),
+            userId: user._id.toString()
+        });
+
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 60 * 60 * 24 * 10 // 10 days
+        });
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Captain logged in successfully",
+            result: {
+                userId: user._id.toString(),
+                fullname: user.fullname,
+                email: user.email,
+                token
+            }
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to login user",
+            error: error
+        });
+    }
+};
+
+
+
+export const getCaptainProfile = async (req: AuthRequest, res: Response) => {
+    try {
+
+        const userId = req.user?.userId;
+
+        if (!userId) {
+            res.status(400).json({ message: 'User not found' });
+            return;
+        };
+
+        const user = await Captain.findById(userId);
+
+        if (!user) {
+            res.status(400).json({ message: 'Captain not found' });
+            return;
+        };
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Captain details fetched successfully",
+            result: user
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to fetch captain details",
+            error: error
+        });
+    }
+};
+
+
+export const logoutCaptain = async (req: Request, res: Response) => {
+    try {
+
+        // const token = req.cookies.token;
+
+        // await BlacklistToken.create({ token });
+
+        // Clear cookies by setting them to empty with immediate expiry
+        res.cookie('token', '', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            expires: new Date(0), // Immediately expire the cookie
+            path: "/",
+        });
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Logout successful",
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to logout",
+            error: error,
+        });
+    }
+}; 
