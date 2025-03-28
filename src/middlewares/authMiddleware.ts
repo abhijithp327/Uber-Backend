@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express"
 import jwt, { JwtPayload } from "jsonwebtoken";
 import dotenv from "dotenv";
+import BlacklistToken from "../models/blachlistToken.model";
 dotenv.config();
 
 interface UserPayload extends JwtPayload {
@@ -13,11 +14,18 @@ interface AuthRequest extends Request {
 }
 
 
-export const verifyToken = (req: AuthRequest, res: Response, next: NextFunction) => {
+export const verifyToken = async (req: AuthRequest, res: Response, next: NextFunction) => {
 
     // Check for the token in cookies
     const token = req.cookies?.token;
     // console.log('token:', token);
+
+    // const isBlacklistedToken = await BlacklistToken.findOne({ token });
+
+    // if (isBlacklistedToken) {
+    //     res.status(401).json({ status: 401, auth: false, success: false, failed: true, message: "Unauthorized token" });
+    //     return;
+    // };
 
     if (!token) {
         res.status(401).json({ status: 401, auth: false, success: false, failed: true, message: "Authentication failed. Token not found" });

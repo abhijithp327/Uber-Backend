@@ -9,12 +9,13 @@ import connectDb from './config/dbConfig';
 
 // Routes
 import userRoutes from './routes/user.route';
+import captainRoutes from './routes/captain.route';
 
 
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 5001;
+const port = process.env.PORT || 5000;
 
 const corsOptions = {
     origin: 'http://localhost:3000',
@@ -31,6 +32,7 @@ app.use(helmet());
 
 // Routes
 app.use('/api/v1/user', userRoutes);
+app.use('/api/v1/captain', captainRoutes);
 
 
 app.get('/', (req: Request, res: Response) => {

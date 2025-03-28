@@ -5,6 +5,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import User from "../models/user.model";
 import { generateAccessToken } from "../utils/token";
+import BlacklistToken from "../models/blachlistToken.model";
 
 
 
@@ -208,6 +209,10 @@ export const getUserProfile = async (req: AuthRequest, res: Response) => {
 
 export const logoutUser = async (req: Request, res: Response) => {
     try {
+
+        // const token = req.cookies.token;
+
+        // await BlacklistToken.create({ token });
 
         // Clear cookies by setting them to empty with immediate expiry
         res.cookie('token', '', {
