@@ -84,7 +84,9 @@ export const registerUser = async (req: Request, res: Response) => {
             success: true,
             message: "User created successfully",
             result: {
-                newUser,
+                userId: newUser._id.toString(),
+                fullname: newUser.fullname,
+                email: newUser.email,
                 token
             }
         });
