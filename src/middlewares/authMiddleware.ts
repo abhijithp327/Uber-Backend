@@ -19,6 +19,7 @@ export const verifyToken = async (req: AuthRequest, res: Response, next: NextFun
     // Check for the token in cookies
     const token = req.cookies?.token;
     // console.log('token:', token);
+    
 
     // const isBlacklistedToken = await BlacklistToken.findOne({ token });
 

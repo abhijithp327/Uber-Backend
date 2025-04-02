@@ -16,7 +16,7 @@ export const generateAccessToken = (user: User): string => {
     
     },
     process.env.JWT_ACCESS as string, // Type assertion to ensure it's a string
-    {  expiresIn: "7d",}
+    {  expiresIn: "10d",}
   );
 };
 

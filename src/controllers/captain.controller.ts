@@ -22,6 +22,7 @@ export const createCaptain = async (req: Request, res: Response) => {
     try {
 
         const { fullname, email, password, vehicle } = req.body;
+        console.log(req.body);
 
         // ✅ Fixed fullname validation
         const schema = Joi.object({
@@ -81,7 +82,7 @@ export const createCaptain = async (req: Request, res: Response) => {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
-            maxAge: 60 * 60 * 24 * 10 // 10 days
+            maxAge: 60 * 60 * 24 * 10 * 1000 // 10 days in milliseconds
         });
 
         res.status(201).json({
@@ -151,7 +152,7 @@ export const loginCaptain = async (req: Request, res: Response) => {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
-            maxAge: 60 * 60 * 24 * 10 // 10 days
+            maxAge: 60 * 60 * 24 * 10 * 1000 // 10 days in milliseconds
         });
 
         res.status(200).json({
